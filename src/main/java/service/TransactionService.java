@@ -24,7 +24,7 @@ public class TransactionService {
         this.bookRepository = bookRepository;
     }
 
-    private void validateProperties(String bookISBN, String memberId, int totalItem) throws DataNotFoundException, DataInvalidException, OutOfStockException {
+    private void validateProperties(String bookISBN, String memberId, int totalItem) throws DataNotFoundException, DataInvalidException {
         Member currentMember = memberRepository.getById(memberId);
         if (currentMember == null) {
             throw new DataNotFoundException("Member not found.");
@@ -38,20 +38,27 @@ public class TransactionService {
         if (totalItem < 1) {
             throw new DataInvalidException("Total item invalid.");
         }
-
-        if (currentBook.getStock() < totalItem) {
-            throw new OutOfStockException("Out of stock.");
-        }
     }
 
     public void createBorrowTransaction(String bookISBN, String memberId, int totalItem) throws DataNotFoundException, DataInvalidException, OutOfStockException {
         validateProperties(bookISBN, memberId, totalItem);
+
+        Book currentBook = bookRepository.getByISBN(bookISBN);
+        if (currentBook.getStock() < totalItem) {
+            throw new OutOfStockException("Out of stock.");
+        }
+
+        bookRepository.decreaseStock(currentBook, totalItem);
         Transaction newTransaction = new Transaction(bookISBN, memberId, TransactionType.BORROW);
         transactionRepository.save(newTransaction);
     }
 
     public void createReturnTransaction(String bookISBN, String memberId, int totalItem) throws DataNotFoundException, DataInvalidException, OutOfStockException {
         validateProperties(bookISBN, memberId, totalItem);
+
+        Book currentBook = bookRepository.getByISBN(bookISBN);
+        bookRepository.increaseStock(currentBook, totalItem);
+
         Transaction newTransaction = new Transaction(bookISBN, memberId, TransactionType.RETURN);
         transactionRepository.save(newTransaction);
     }

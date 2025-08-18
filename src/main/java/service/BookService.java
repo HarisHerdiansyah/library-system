@@ -15,11 +15,11 @@ public class BookService {
     }
 
     public void addBook(String title, String author, int stock) throws DataInvalidException {
-        if (title.length() < 8) {
+        if (title.length() < 8 || title.isBlank()) {
             throw new DataInvalidException("Title must be at least 8 characters.");
         }
 
-        if (author.isEmpty()) {
+        if (author.isBlank()) {
             throw new DataInvalidException("Author's name cannot be empty.");
         }
 

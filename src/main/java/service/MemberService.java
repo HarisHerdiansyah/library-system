@@ -16,7 +16,7 @@ public class MemberService {
     }
 
     public void register(String name) throws DataInvalidException {
-        if (name.length() < 3 || !ValidationUtils.validateName(name)) {
+        if (name.length() < 4 || !ValidationUtils.validateName(name)) {
             throw new DataInvalidException("Name must be at least 4 characters and only letters");
         }
 
